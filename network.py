@@ -6,11 +6,17 @@ class som_network():
         self._m = som_m
         self._n = som_n
         self.weights = np.random.uniform(-1, 1, (self._m, self._n, input_size))
+        self.input_dim = input_size
         """
         self.p = np.random.rand(self._m, self._n)
         self.B = 0.2
         self.C = 0.2
         """
+        self.position = np.zeros((self._m, self._n, 2))
+        for i in range(self._m):
+            for j in range(self._n):
+                self.position[i][j][0] = i
+                self.position[i][j][1] = j
 
     def forward(self, input):
         # select the winner
@@ -30,9 +36,15 @@ class som_network():
 
     def backward(self, win_i, win_j, neighbor_raduis, learning_rate):
         # update winner & neighborhood
+        """
         for i in range(self._m):
             for j in range(self._n):
                 distance = np.linalg.norm(np.array([i, j]) - np.array([win_i, win_j]))
                 output_gradient = np.exp(- distance**2 / (2 * neighbor_raduis**2))
                 # squeeze: (2, 1) -> (2, )
                 self.weights[i][j] += learning_rate * output_gradient * (np.squeeze(self.input) - self.weights[i][j])
+        """
+        distances = np.linalg.norm(self.position - np.array([win_i, win_j]), axis=2)
+        out = np.exp(- distances**2 / (2 * neighbor_raduis**2))
+        tmp = np.reshape(np.squeeze(self.input), (1, 1, self.input_dim))
+        self.weights += learning_rate * (out[:, :, None] * (tmp - self.weights))

@@ -3,7 +3,7 @@ from network import som_network
 import math
 from random import shuffle
 from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 def predict(network, data):
     output = data
